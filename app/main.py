@@ -15,7 +15,7 @@ def get_clean_data():
         './Data/data.csv',        # Alternative local path
     ]
     
-    # Try each path until one works
+    # Try each path until one works (without debug messages)
     for path in data_paths:
         try:
             # Try to read the file without debug messages
@@ -30,7 +30,7 @@ def get_clean_data():
             continue
     
     # If no path worked, show error and stop
-    st.error("Cannot find data file. Please make sure 'data.csv' is available in the repository.")
+    st.error("Cannot find data file. Please make sure data.csv is available.")
     st.stop()
 
 def get_scaled_values(input_dict):
@@ -169,10 +169,10 @@ def add_predictions(input_data):
     if prediction[0]== 0:
         st.write("<span class='diagnosis benign'>Benign</span>", unsafe_allow_html=True)
     else:
-        st.write("<span class='diagnosis malicious'>Malicious</span>", unsafe_allow_html=True)
+        st.write("<span class='diagnosis malicious'>Malignant</span>", unsafe_allow_html=True)
 
     st.write("Probability of being benign: ", model.predict_proba(input_array_scaled)[0][0])
-    st.write("Probability of being malicious: ", model.predict_proba(input_array_scaled)[0][1])
+    st.write("Probability of being malignant: ", model.predict_proba(input_array_scaled)[0][1])
 
     st.write("This app may assist professionals in making a diagnosis, but shouldn't be used as a substitute for a professional diagnosis.")
 
@@ -196,6 +196,14 @@ def main():
         .diagnosis.malicious { background-color: #d9534f; color: white; }
         </style>
         """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    <style>
+    .diagnosis { font-weight: bold; padding: 8px 16px; border-radius: 4px; display: inline-block; }
+    .diagnosis.benign { background-color: #5cb85c; color: white; }
+    .diagnosis.malicious { background-color: #d9534f; color: white; }
+    </style>
+    """, unsafe_allow_html=True)
     
     input_data=add_sidebar()
     
