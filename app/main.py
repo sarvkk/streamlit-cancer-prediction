@@ -18,13 +18,8 @@ def get_clean_data():
     # Try each path until one works
     for path in data_paths:
         try:
-            # Print debug info
-            st.write(f"Trying to load data from: {path}")
-            st.write(f"Current working directory: {os.getcwd()}")
-            
-            # Try to read the file
+            # Try to read the file without debug messages
             df = pd.read_csv(path)
-            st.success(f"Successfully loaded data from {path}")
             
             # Process the data
             df.drop(columns=['Unnamed: 32','id'], inplace=True)
@@ -166,23 +161,20 @@ def add_predictions(input_data):
     input_array = np.array(list(input_data.values())).reshape(1, -1)
     
     input_array_scaled = scaler.transform(input_array)
-
     prediction = model.predict(input_array_scaled)
 
     st.subheader("Cell Cluster prediction")
-
     st.write("The cell cluster is:")
 
     if prediction[0]== 0:
-        st.write("<span class='diagnosis benign'>Bengin</span>",unsafe_allow_html=True)
+        st.write("<span class='diagnosis benign'>Benign</span>", unsafe_allow_html=True)
     else:
-        st.write("<span class='diagnosis malicious'>Malicious</span>",unsafe_allow_html=True)
+        st.write("<span class='diagnosis malicious'>Malicious</span>", unsafe_allow_html=True)
 
-    st.write("Probability of being benign: ",model.predict_proba(input_array_scaled)[0][0])
-    st.write("Probability of being malicious: ",model.predict_proba(input_array_scaled)[0][1])
+    st.write("Probability of being benign: ", model.predict_proba(input_array_scaled)[0][0])
+    st.write("Probability of being malicious: ", model.predict_proba(input_array_scaled)[0][1])
 
     st.write("This app may assist professionals in making a diagnosis, but shouldn't be used as a substitute for a professional diagnosis.")
-
 
 def main():
     st.set_page_config(
@@ -209,7 +201,15 @@ def main():
     
     with st.container():
         st.title("Breast Cancer Predictor")
-        st.write("Please connect this app to your cytology lab to help diagnose breast cancer from you tissue sample. This app predicts using a machine learning model whether a breast mass in benign or malignant based on the measurements it receives from your cytosis lab. You can also update the measurements by hand using sliders in the sidebar.")
+        st.write("""
+        This educational tool demonstrates how machine learning can help classify cell nuclei characteristics as benign or malignant. 
+        
+        The model has been trained on the Wisconsin Breast Cancer dataset and analyzes 30 features extracted from digitized images of fine needle aspirates (FNA) of breast masses.
+        
+        Use the sliders in the sidebar to adjust cell measurements and observe how different parameters affect the prediction. The radar chart visualizes the relationship between different measurements.
+        
+        **Note:** This is a demonstration only and not intended for medical diagnosis. Always consult healthcare professionals for medical advice.
+        """)
 
     col1, col2= st.columns([4,1])
     
