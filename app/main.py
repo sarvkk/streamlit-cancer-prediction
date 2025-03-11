@@ -128,9 +128,14 @@ def add_sidebar():
     return input_dict
 
 def add_predictions(input_data):
-    model = pickle.load(open('Model/model.pkl','rb'))
-    scaler = pickle.load(open('Model/scaler.pkl','rb'))
-
+    try:
+        model = pickle.load(open('model.pkl','rb'))
+        scaler = pickle.load(open('scaler.pkl','rb'))
+    except FileNotFoundError:
+        # Try alternative path
+        model = pickle.load(open('Model/model.pkl','rb'))
+        scaler = pickle.load(open('Model/scaler.pkl','rb'))
+    
     input_array = np.array(list(input_data.values())).reshape(1, -1)
     
     input_array_scaled = scaler.transform(input_array)
@@ -159,9 +164,20 @@ def main():
         layout='wide',
         initial_sidebar_state='expanded'
     )
-    with open('assets/styles.css') as f:
-        st.markdown("<style>{}</style>".format(f.read()),unsafe_allow_html=True)
-
+    
+    try:
+        with open('assets/styles.css') as f:
+            st.markdown("<style>{}</style>".format(f.read()), unsafe_allow_html=True)
+    except FileNotFoundError:
+        # Fallback 
+        st.markdown("""
+        <style>
+        .diagnosis { font-weight: bold; padding: 8px 16px; border-radius: 4px; display: inline-block; }
+        .diagnosis.benign { background-color: #5cb85c; color: white; }
+        .diagnosis.malicious { background-color: #d9534f; color: white; }
+        </style>
+        """, unsafe_allow_html=True)
+    
     input_data=add_sidebar()
     
     with st.container():
