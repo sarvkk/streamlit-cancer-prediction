@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pickle5 as pickle
 import pandas as pd
@@ -5,11 +6,37 @@ import numpy as np
 import plotly.graph_objects as go
 
 def get_clean_data():
-    df=pd.read_csv('../Data/data.csv')
-    df.drop(columns=['Unnamed: 32','id'] ,inplace=True)
-    df = df.dropna()
-    df['diagnosis']=df['diagnosis'].map({'M':1,'B':0})
-    return df
+    """Load and clean the breast cancer data, trying multiple file paths."""
+    # List all possible file paths in order of preference
+    data_paths = [
+        'data.csv',               # In app directory (for Streamlit Cloud)
+        'app/data.csv',           # Alternative app directory path
+        '../Data/data.csv',       # Local development path
+        './Data/data.csv',        # Alternative local path
+    ]
+    
+    # Try each path until one works
+    for path in data_paths:
+        try:
+            # Print debug info
+            st.write(f"Trying to load data from: {path}")
+            st.write(f"Current working directory: {os.getcwd()}")
+            
+            # Try to read the file
+            df = pd.read_csv(path)
+            st.success(f"Successfully loaded data from {path}")
+            
+            # Process the data
+            df.drop(columns=['Unnamed: 32','id'], inplace=True)
+            df = df.dropna()
+            df['diagnosis'] = df['diagnosis'].map({'M':1, 'B':0})
+            return df
+        except FileNotFoundError:
+            continue
+    
+    # If no path worked, show error and stop
+    st.error("Cannot find data file. Please make sure 'data.csv' is available in the repository.")
+    st.stop()
 
 def get_scaled_values(input_dict):
     data = get_clean_data()
